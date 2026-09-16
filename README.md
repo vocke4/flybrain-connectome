@@ -13,8 +13,7 @@ single-source-of-truth (SSOT) ledger in this package.
 
 | Path | What it is |
 |---|---|
-| `manuscript/preprint.md` | Final manuscript (canonical text, Markdown) |
-| `manuscript/preprint_v2.pdf` | Final manuscript (PDF render) |
+| `manuscript/Prep_printv2.pdf` | Final manuscript (PDF, print-prepared) |
 | `results/ledger/ssot_results.jsonl` | **SSOT ledger** — 87 records → 84 unique dual-seed runs. Single source of truth for every number in the paper |
 | `results/ledger/des_build.log` | Degree-preservation verification log for all 6 DES null connectomes |
 | `results/ssot_synthesis.md` | Aggregate statistics (mean ± SD over 3 seed-pairs, bootstrap 95% CIs) |
