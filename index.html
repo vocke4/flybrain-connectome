@@ -21,9 +21,9 @@
   td, th { border: 1px solid #30363d; padding: 6px 10px; text-align:left; vertical-align: top; hyphens: none; }
   th { background:#161b22; white-space: nowrap; }
   /* package contents table: two-col, fixed-ish for alignment */
-  .repo table { table-layout: fixed; width: 100%; }
-  .repo td:first-child, .repo th:first-child { width: 42%; }
-  .repo code { overflow-wrap: break-word; word-break: normal; hyphens: none; }
+  .repo table { table-layout: auto; }
+  .repo td:first-child, .repo th:first-child { white-space: nowrap; }
+  .repo td:first-child code { white-space: nowrap; }
   .repo td:last-child { overflow-wrap: break-word; }
   /* paper tables: auto-fit to content, wrapped in .tblwrap for narrow screens */
   .paper table { font-size: 0.85em; table-layout: auto; }
