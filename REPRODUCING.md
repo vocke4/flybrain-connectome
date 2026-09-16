@@ -50,7 +50,7 @@ shasum -a 256 data/female/*.feather data/male/*.feather
 ## 2. Normalize the connectomes
 
 ```bash
-python code/normalize.py
+python normalize.py
 ```
 
 Produces `normalized/{banc_female,mcns_male}.npz` edge lists
@@ -67,20 +67,20 @@ inhibitory = GABA/histamine/serotonin/glycine; mixed/unknown dropped
 ```bash
 # Degree-preserving double-edge-swap nulls (Q=10, 3 seeds × 2 sexes).
 # Verifies degree sequences identical after swapping; logs to results/ssot/des_build.log
-python code/double_edge_swap.py banc_female --q 10 --seed 0   # repeat --seed 1 2
-python code/double_edge_swap.py mcns_male   --q 10 --seed 0   # repeat --seed 1 2
+python double_edge_swap.py banc_female --q 10 --seed 0   # repeat --seed 1 2
+python double_edge_swap.py mcns_male   --q 10 --seed 0   # repeat --seed 1 2
 
 # Size-matched random ablation nulls (5 seeds × 2 sexes; k = dimorphic count)
-python code/ablation_null.py banc_female 3803 --k-seeds 5
-python code/ablation_null.py mcns_male   3900 --k-seeds 5
+python ablation_null.py banc_female 3803 --k-seeds 5
+python ablation_null.py mcns_male   3900 --k-seeds 5
 
 # Sign-shuffle control (preserves all wiring and sign counts)
-python code/null_model.py banc_female --seed 0
-python code/null_model.py mcns_male   --seed 0
+python null_model.py banc_female --seed 0
+python null_model.py mcns_male   --seed 0
 ```
 
 **Validation built in:** the DES script asserts degree sequences are identical after
-rewiring (see `results/ledger/des_build.log`: 133,797,400 swaps female / 244,109,500
+rewiring (see `results/ssot/des_build.log`: 133,797,400 swaps female / 244,109,500
 male, ~99% acceptance, "degree sequences verified identical" ×6).
 
 ## 4. Run the dual-seed experiment queue
@@ -90,7 +90,7 @@ used in the paper — (weight_seed, sim_seed) = (0,42), (1,43), (2,44) for stoch
 transforms; weight_seed=0 with 3 sim seeds for deterministic transforms:
 
 ```bash
-python code/gen_queue.py          # writes queue_female.sh / queue_male.sh (relative-path commands)
+python gen_queue.py          # writes queue_female.sh / queue_male.sh (relative-path commands)
 bash queue_female.sh              # or run the two lanes in parallel
 bash queue_male.sh
 ```
@@ -111,7 +111,7 @@ cv_isi, participation_ratio, wall_s, ts}`.
 To reproduce any single condition directly:
 
 ```bash
-python code/ssot_run.py --source banc_female --tag anchor_ln_s1.6_w0.1 \
+python ssot_run.py --source banc_female --tag anchor_ln_s1.6_w0.1 \
     --transform lognormal --sigma 1.6 --w-syn 0.1 \
     --weight-seed 0 --sim-seed 42 --duration 2000
 ```
@@ -123,16 +123,16 @@ run `model.py` for both sexes at the linear baseline, which saves
 `runs/{banc_female,mcns_male}_spikes.npz`:
 
 ```bash
-python code/model.py banc_female --duration 2000
-python code/model.py mcns_male   --duration 2000
+python model.py banc_female --duration 2000
+python model.py mcns_male   --duration 2000
 ```
 
 ## 5. Rate-matching controls (§3.8)
 
 ```bash
-python code/te_control2.py    # per-neuron rate-matched transfer entropy
-python code/pr_control.py     # per-neuron rate-matched participation ratio
-python code/cv_control.py     # rate-matched CV of ISI
+python te_control2.py    # per-neuron rate-matched transfer entropy
+python pr_control.py     # per-neuron rate-matched participation ratio
+python cv_control.py     # rate-matched CV of ISI
 ```
 
 Expected outcomes (match manuscript §3.8):
@@ -145,7 +145,7 @@ Expected outcomes (match manuscript §3.8):
 ## 6. Aggregate and verify
 
 ```bash
-python code/aggregate_ssot.py
+python aggregate_ssot.py
 ```
 
 Deduplicates the ledger (last-timestamp-wins per `(tag, source, weight_seed, sim_seed)`),
@@ -172,11 +172,11 @@ wall-clock fields; `aggregate_ssot.py` output is byte-stable for a given ledger.
 ## 7. Remaining analyses
 
 ```bash
-python code/localize.py          # dimorphic-neuron identification + localization (§2.8)
-python code/robustness.py        # drive/w_syn robustness sweeps
-python code/run_sigma_sweep.py <sigma>          # single-seed σ sweep (legacy study)
-python code/run_linear_sweep.py <w_syn>         # legacy linear sweep
-python code/weight_sensitivity.py <name> --transform <t>   # legacy single-seed tool
+python localize.py          # dimorphic-neuron identification + localization (§2.8)
+python robustness.py        # drive/w_syn robustness sweeps
+python run_sigma_sweep.py <sigma>          # single-seed σ sweep (legacy study)
+python run_linear_sweep.py <w_syn>         # legacy linear sweep
+python weight_sensitivity.py <name> --transform <t>   # legacy single-seed tool
 ```
 
 Legacy single-seed tools are retained for provenance of the sensitivity study only;

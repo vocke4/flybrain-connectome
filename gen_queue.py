@@ -20,13 +20,14 @@ Job groups (PRD mapping):
 
 import numpy as np
 import os
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 NORM = os.path.join(HERE, "normalized")
 OUT = os.path.join(HERE, "results", "ssot")
 os.makedirs(OUT, exist_ok=True)
 
-PY = os.path.join(HERE, "venv", "bin", "python")
+PY = os.path.join(HERE, "venv", "bin", "python") if os.path.exists(os.path.join(HERE, "venv", "bin", "python")) else sys.executable
 SEEDS = [(0, 42), (1, 43), (2, 44)]
 
 

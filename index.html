@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grillaert &amp; Vocke 2026 — Sex differences in whole-brain dynamics of the Drosophila CNS connectome</title>
+<style>
+  :root { color-scheme: dark; }
+  body { margin:0; font-family: Georgia, 'Times New Roman', serif; background:#0e1117; color:#d8dee6; line-height:1.65; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 40px 24px 80px; }
+  .badge { display:inline-block; font-family: monospace; font-size: 0.8em; color:#8b949e; border:1px solid #30363d; border-radius:6px; padding:2px 10px; margin: 4px 6px 4px 0; }
+  h1 { font-size: 1.75em; line-height:1.25; color:#f0f3f6; margin: 20px 0 4px; }
+  .authors { color:#9aa4b2; font-style: italic; margin: 0 0 20px; }
+  h2 { color:#f0f3f6; border-bottom: 1px solid #21262d; padding-bottom: 6px; margin-top: 40px; }
+  h3 { color:#e6edf3; margin-top: 28px; }
+  a { color:#58a6ff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  .btn { display:inline-block; background:#238636; color:#fff; font-family:-apple-system,sans-serif; font-weight:600; border-radius:6px; padding:8px 16px; text-decoration:none; margin: 6px 8px 6px 0; }
+  .btn.alt { background:#21262d; border:1px solid #30363d; }
+  table { border-collapse: collapse; width:100%; font-size: 0.88em; margin: 14px 0; }
+  td, th { border: 1px solid #30363d; padding: 6px 10px; text-align:left; vertical-align: top; }
+  th { background:#161b22; }
+  code { background:#161b22; padding:1px 6px; border-radius:4px; font-size:0.9em; }
+  pre { background:#161b22; padding:14px; border-radius:8px; overflow-x:auto; }
+  pre code { background:none; padding:0; }
+  .paper { background:#0b0f14; border:1px solid #21262d; border-radius:10px; padding: 28px 30px; margin-top: 18px; }
+  .paper p { text-align: justify; }
+  .repo { margin-top: 56px; }
+  .repo-head { border-top: 2px solid #30363d; padding-top: 26px; }
+  footer { margin-top:56px; color:#8b949e; font-size:0.85em; border-top:1px solid #21262d; padding-top:16px; }
+  .paper hr { border:none; border-top:1px solid #21262d; margin: 22px 0; }
+</style>
+</head>
+<body><div class="wrap">
+
+<span class="badge">Drosophila</span><span class="badge">connectomics</span><span class="badge">whole-brain dynamics</span><span class="badge">LIF model</span><span class="badge">criticality</span><span class="badge">reproducibility</span>
+
+<div class="paper">
+<h1 id="sex-differences-in-whole-brain-dynamics-of-the-drosophila-cns-connectome">Sex differences in whole-brain dynamics of the Drosophila CNS connectome</h1>
+<p><strong>A matched leaky integrate-and-fire comparison with degree-preserving, sign-shuffle, and ablation-null controls</strong></p>
+<p><em>Katie Grillaert and Ed Vocke</em></p>
+<hr />
+<h2 id="abstract">Abstract</h2>
+<p>The completion of synapse-resolution connectomes for both the female (BANC) and male (MCNS) adult <em>Drosophila melanogaster</em> central nervous system enables a direct, whole-brain comparison of sex-specific wiring through dynamics. We embed both connectomes in an identical leaky integrate-and-fire model (weights from synapse counts, signs from neurotransmitter identity, matched 1% Poisson drive) and quantify recruitment, firing rates, and criticality under a single-source-of-truth protocol: every condition is run under three independent (weight-seed, simulation-seed) pairs, and every headline ratio carries a bootstrap confidence interval. Under lognormal weights matched to the literature’s fitted log-spread (SD(log w) ≈ 1.83, obtained at σ = 1.6), the male recruits 79.0 ± 0.2% of neurons in a 2 s window versus 45.0 ± 0.5% in the female — a 1.75× ratio (95% CI 1.74–1.78) — with both networks self-organized near criticality (branching ratio m = 0.98–1.005 in every condition). A degree-preserving double-edge-swap null decomposes the log-scale gap: <strong>58% of the sex difference is destroyed by rewiring (specific wiring), 42% survives on degree/density structure alone</strong>. Rewiring also reveals that both brains’ specific wiring is net-suppressive relative to their own degree structure (female 45→72%, male 79→91% recruited). The recruitment ratio is gain-dependent — 26× (21.9–33.7) under linear weights, 14.5–17× (mean-weight-matched lognormal sweep), 1.75× at the literature-matched anchor — reflecting where on a shared critical recruitment curve each sex sits: the male reaches equivalent recruitment at 2–3× lower synaptic weight. Higher-order metrics that scale with firing rate (transfer entropy, participation ratio, CV of ISI) are shown by direct test to be highly susceptible to artifactual divergence between networks of different activity levels (§3.8). Silencing dimorphic neurons (2.4% of cells) reduces male recruitment by 8.4% relative, versus 4.9% for size-matched random ablation — a modest, distributed effect with its proper null. We release the dual-seed protocol as a reproducibility standard for connectome-dynamics comparisons.</p>
+<hr />
+<h2 id="introduction">1. Introduction</h2>
+<p>The connectome specifies the synaptic paths by which neurons can influence one another, but not the dynamics that emerge from those paths (Pospisil et al., 2024). With synapse-resolution connectomes now available for the adult female CNS (BANC; 169,078 neurons) and male CNS (MCNS; 163,511 neurons), one can ask a question that brain-only comparisons cannot answer cleanly: <strong>when two whole nervous systems that differ in sex-specific wiring are embedded in the identical dynamical model, do they produce measurably different dynamics — and is any difference attributable to specific wiring, to degree/density structure, or to localized sex-specific circuits?</strong></p>
+<p>We answer this with an intervention-first design. Rather than comparing summary statistics of spontaneous activity and post-hoc explaining them, we run matched perturbations on both networks:</p>
+<ol type="1">
+<li><strong>Weight-rule manipulations</strong> (linear, log1p, sqrt, lognormal with matched mean or matched spread) to test whether the sex difference survives defensible weight rules;</li>
+<li><strong>Degree-preserving double-edge-swap (DES) rewiring</strong> of each sex’s own connectome, which preserves the exact in- and out-degree sequences while destroying specific wiring — isolating the contribution of <em>which</em> edges exist from <em>how many</em> each neuron has;</li>
+<li><strong>Sign-shuffling</strong> to test whether excitatory/inhibitory structure is net-suppressive or net-amplifying;</li>
+<li><strong>Size-matched random ablation</strong> as the null for dimorphic-neuron silencing.</li>
+</ol>
+<p>All experiments flow into a single append-only results ledger (<code>ssot_results.jsonl</code>); every number in this paper is traceable to that file, and every condition is sampled over independent weight and simulation seeds.</p>
+<p>A companion methodological result shapes the paper: metrics that scale with firing rate (transfer entropy, participation ratio, CV of ISI) diverge artifactually between networks of different activity levels. Section 3.8 quantifies these rate-confounding vulnerabilities and the controls required to neutralize them — a caution that applies to any connectome-dynamics comparison in which the networks under study differ in overall activity.</p>
+<hr />
+<h2 id="methods">2. Methods</h2>
+<h3 id="data">2.1 Data</h3>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th>Dataset</th>
+<th>Sex</th>
+<th>Scope</th>
+<th>Neurons</th>
+<th>Edges</th>
+<th>Synapses</th>
+<th>Mean count</th>
+<th>SD(log count)</th>
+<th>E/I edges</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BANC v888</td>
+<td>Female</td>
+<td>Whole CNS</td>
+<td>169,078</td>
+<td>13,379,740</td>
+<td>41.5M</td>
+<td>3.10</td>
+<td>0.825</td>
+<td>75/25</td>
+</tr>
+<tr>
+<td>MCNS v1.0</td>
+<td>Male</td>
+<td>Whole CNS</td>
+<td>163,511</td>
+<td>24,410,950</td>
+<td>117.5M</td>
+<td>4.81</td>
+<td>0.983</td>
+<td>80/20</td>
+</tr>
+</tbody>
+</table>
+<p>BANC and MCNS are the primary comparison (both whole-CNS). All data are publicly available (Janelia FlyEM, FlyWire Codex); no authentication was required. The male flat connectome was filtered to annotated neurons; neurotransmitter consensus calls map to signs (see §2.2).</p>
+<h3 id="normalization">2.2 Normalization</h3>
+<p>Each connectome was converted to a common edge list <code>(pre_idx, post_idx, count, sign)</code>, where <code>count</code> is the synapse count and <code>sign ∈ {+1, −1}</code> is derived from neurotransmitter identity:</p>
+<ul>
+<li><strong>Excitatory (+1):</strong> acetylcholine, glutamate, dopamine, octopamine, tyramine</li>
+<li><strong>Inhibitory (−1):</strong> GABA, histamine, serotonin, glycine</li>
+<li><strong>Unclear:</strong> dropped (documented limitation; affects both sexes similarly)</li>
+</ul>
+<h3 id="model">2.3 Model</h3>
+<p>Both connectomes were embedded in an identical LIF model (Brian2, Cython codegen):</p>
+<pre><code>dv/dt = (v_rest − v)/τ  (unless refractory);  threshold v &gt; v_th;  reset v = v_rest</code></pre>
+<p>with <code>v_rest = −65 mV</code>, <code>v_th = −50 mV</code>, <code>τ = 10 ms</code>, refractory period 2.2 ms, simulated for 2000 ms. A uniformly random 1% of neurons (1,635 male / 1,690 female) received independent Poisson drive at 100 Hz, each event depolarizing the target by 5 mV. Synapses were <code>w = sign · |w| · mV</code> with delays omitted (all-to-all chemical capture at 1 ms resolution is out of scope; see Limitations).</p>
+<h3 id="weight-transforms-and-the-σ-parameterization">2.4 Weight transforms and the σ parameterization</h3>
+<p>Four rules map counts to weight magnitudes:</p>
+<ul>
+<li><strong>linear:</strong> <code>|w| = count · w_syn</code></li>
+<li><strong>log1p:</strong> <code>|w| = log(1 + count) · w_syn</code></li>
+<li><strong>sqrt:</strong> <code>|w| = √count · w_syn</code></li>
+<li><strong>lognormal:</strong> <code>|w| = exp(N(ln max(count, 1), σ)) · w_syn</code> (drawn per edge from <code>weight_seed</code>)</li>
+</ul>
+<p>For the lognormal rule, <code>SD(log|w|) = √(SD(log count)² + σ²)</code>. The recent connectome-constrained fitting literature (bioRxiv 2026.08.21.745055) reports fitted weight log-spread SD(log w) = 1.83 (truncated-lognormal MLE). Matching that spread requires σ = √(1.83² − 0.983²) ≈ 1.55 for the male and σ = √(1.83² − 0.825²) ≈ 1.64 for the female; we adopt <strong>σ = 1.6</strong> as the literature-matched condition. Note σ = 1.83 itself would <em>overshoot</em> the fitted spread by inflating it with the count dispersion — the distinction between total log-spread and draw dispersion matters operationally.</p>
+<p>Two anchor regimes are reported side by side:</p>
+<ul>
+<li><strong>Spread-matched anchor:</strong> σ = 1.6 at raw <code>w_syn = 0.1</code>. Mean |w| exceeds the linear baseline (1.12 mV female, 1.73 mV male vs 0.31 mV), placing both networks in a high-recruitment regime.</li>
+<li><strong>Mean-matched sweep:</strong> <code>w_syn(σ) = 0.1 · exp(−σ²/2)</code>, which holds E[|w|] = E[count] · 0.1 fixed while varying only dispersion (σ = 0.5 → 0.0888, 1.0 → 0.0607, 1.6 → 0.0278). This isolates the effect of weight <em>dispersion</em> from weight <em>gain</em> — a confound present in naive σ sweeps, where E[|w|] grows as exp(σ²/2).</li>
+</ul>
+<h3 id="null-models">2.5 Null models</h3>
+<ol type="1">
+<li><strong>Degree-preserving double-edge swap (DES).</strong> Starting from each sex’s real edge set (64-bit keyed (pre, post) pairs), we perform Q·|E| attempted swaps (Q = 10; ~134M attempts female, ~244M male per seed) of random edge pairs, reassigning targets when the resulting edge set is edge-set-identical-free (rejection sampling). In- and out-degree sequences are preserved <em>exactly</em> — verified identical post-swap for every seed. Weights travel with their source edge. Acceptance rates: 99.1% (female), 98.7% (male). Three seeds per sex.</li>
+<li><strong>Sign-shuffle.</strong> Fisher–Yates permutation of the sign vector across edges, preserving the excitatory/inhibitory counts and all wiring.</li>
+<li><strong>Size-matched random ablation.</strong> All edges touching k uniformly random neurons are removed, k = 3,900 (male) / 3,803 (female) — exactly the dimorphic-neuron counts used in §2.7. Five seeds per sex.</li>
+</ol>
+<h3 id="single-source-of-truth-ssot-protocol-and-statistics">2.6 Single-source-of-truth (SSOT) protocol and statistics</h3>
+<p>Every simulation writes one JSON record to an append-only ledger keyed by <code>(tag, source, weight_seed, sim_seed)</code>. Conditions are sampled over three seed-pairs (weight_seed, sim_seed) ∈ {(0,42), (1,43), (2,44)} for real networks; null-network simulations use the null build seed as weight_seed (three DES seeds) with a fixed simulation seed (single-seed dynamics for nulls; their cross-seed SD proved negligible, ≤ 0.21 percentage points). DES builds for all six networks (3 seeds × 2 sexes) were completed and degree-verified before their simulations were queued.</p>
+<p>We report mean ± SD across seed-pairs (SD with ddof = 1) and two-sided 95% CIs on male/female ratios via 10,000-resample bootstrap over seed-pairs. Aggregation deduplicates the ledger by key with last-timestamp-wins. Recruitment is the fraction of neurons firing ≥ 1 spike in 2000 ms; population rate is spikes/s averaged over all neurons (“rate_all”).</p>
+<h3 id="metrics">2.7 Metrics</h3>
+<ul>
+<li><strong>Recruitment (% fired)</strong> — primary readout (robust to rate confounding by construction).</li>
+<li><strong>Population rate (Hz, all neurons)</strong> and <strong>per-active-neuron rate</strong>.</li>
+<li><strong>Branching ratio m</strong> — mean descendants per ancestor in 1 ms bins (criticality: m = 1).</li>
+<li><strong>CV of ISI</strong> — reported but interpreted as rate-dependent (§3.8).</li>
+<li><strong>Transfer entropy, participation ratio</strong> — rate-dependent; see §3.8 and Limitations.</li>
+</ul>
+<h3 id="dimorphic-neuron-identification-and-silencing">2.8 Dimorphic-neuron identification and silencing</h3>
+<p>Sexually dimorphic neurons were identified from annotation flags (male: <code>dimorphism</code>, <code>fruDsx</code>; female: <code>sexually_dimorphic</code>); 2.4% of cells in each sex. Silencing removes all edges touching dimorphic neurons (both sexes’ own dimorphic sets). The size-matched random-ablation null (§2.5) provides the control.</p>
+<hr />
+<h2 id="results">3. Results</h2>
+<h3 id="the-recruitment-gap-exists-under-every-weight-rule">3.1 The recruitment gap exists under every weight rule</h3>
+<p>Under linear weights at the critical point (w_syn = 0.1), the male recruits 35.20 ± 0.68% of neurons versus 1.35 ± 0.29% in the female — a <strong>26.1× ratio (95% CI 21.9–33.7)</strong> (Table 1). Under lognormal weights at matched mean weight, the ratio is 14.5–17× across σ (Table 4). At the literature-matched spread anchor, both networks recruit heavily and the ratio compresses to 1.75× (§3.2). The direction of the gap is invariant; its magnitude depends on where each sex sits on the recruitment curve.</p>
+<p><strong>Table 1. Baseline dynamics (2000 ms, linear weights, w_syn = 0.1; mean ± SD over 3 seed-pairs).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Female BANC</th>
+<th>Male MCNS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recruitment (% fired)</td>
+<td>1.35 ± 0.29</td>
+<td>35.20 ± 0.68</td>
+</tr>
+<tr>
+<td>Population rate (Hz, all neurons)</td>
+<td>0.07 ± 0.04</td>
+<td>15.50 ± 3.85</td>
+</tr>
+<tr>
+<td>Branching ratio m</td>
+<td>0.999 ± 0.000</td>
+<td>1.001 ± 0.002</td>
+</tr>
+<tr>
+<td>CV of ISI</td>
+<td>1.04 ± 0.22</td>
+<td>2.74 ± 0.47</td>
+</tr>
+</tbody>
+</table>
+<p>Under log1p and sqrt compression both sexes collapse to the 1.00 ± 0.00% drive floor (only directly driven neurons fire): the network is subcritical and the sex gap vanishes. The male’s excess activity is therefore carried by high-count connections — compress them and the gap disappears; this motivates the lognormal analysis, which allows strong edges without collapsing them.</p>
+<h3 id="literature-matched-lognormal-weights-1.75-recruitment-gap">3.2 Literature-matched lognormal weights: 1.75× recruitment gap</h3>
+<p>At σ = 1.6, w_syn = 0.1 (SD(log|w|) ≈ 1.83, matching the fitted literature spread):</p>
+<p><strong>Table 2. σ = 1.6 anchor (w_syn = 0.1; mean ± SD over 3 seed-pairs).</strong></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Female BANC</th>
+<th>Male MCNS</th>
+<th>Ratio (M/F)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Recruitment (% fired)</td>
+<td>45.04 ± 0.49</td>
+<td>79.03 ± 0.16</td>
+<td><strong>1.75× [1.74, 1.78]</strong></td>
+</tr>
+<tr>
+<td>Population rate (Hz)</td>
+<td>69.48 ± 16.40</td>
+<td>183.21 ± 1.89</td>
+<td>2.64×</td>
+</tr>
+<tr>
+<td>Per-active-neuron rate (Hz)</td>
+<td>154.1 ± 35.4</td>
+<td>231.8 ± 2.8</td>
+<td>1.50×</td>
+</tr>
+<tr>
+<td>Branching ratio m</td>
+<td>1.000 ± 0.000</td>
+<td>0.998 ± 0.001</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The male recruits 1.75× more of the network, fires its active neurons ~1.5× faster, and integrates to a 2.6× higher population rate. Note the female’s population-rate CI is wide (±16 Hz on 69 Hz): at this operating point the female sits near an ignition threshold and individual seeds differ in how much of the network catches (see also §3.7). Recruitment, not rate, is the primary readout throughout.</p>
+<h3 id="degree-preserving-decomposition-58-wiring-42-degree-structure">3.3 Degree-preserving decomposition: 58% wiring, 42% degree structure</h3>
+<p>DES rewiring preserves each network’s exact degree sequences while randomizing which edges exist. If the sex gap were a property of degree/density structure alone, rewiring would preserve it; if a property of specific wiring, rewiring would destroy it. The result is a decomposition:</p>
+<p><strong>Table 3. Real vs DES-rewired networks (σ = 1.6, w_syn = 0.1; DES: mean ± SD over 3 build seeds).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Network</th>
+<th>Recruitment real</th>
+<th>Recruitment DES</th>
+<th>log-gap destroyed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Female BANC</td>
+<td>45.04 ± 0.49%</td>
+<td>72.12 ± 0.21%</td>
+<td>0.471 log units</td>
+</tr>
+<tr>
+<td>Male MCNS</td>
+<td>79.03 ± 0.16%</td>
+<td>91.46 ± 0.05%</td>
+<td>0.146 log units</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>Real log-gap: ln(79.03/45.04) = <strong>0.562</strong></li>
+<li>DES log-gap: ln(91.46/72.12) = <strong>0.238</strong></li>
+<li><strong>Specific wiring accounts for (0.562 − 0.238)/0.562 = 58% of the sex gap; degree/density structure accounts for 42%.</strong></li>
+<li>Rewired ratio: 1.27× [1.26, 1.27].</li>
+</ul>
+<p>Two conclusions follow. First, <strong>nearly half the gap survives on degree/density alone</strong> — the difference is not purely a wiring property. Second, and more surprisingly, <em>both</em> brains’ specific wiring is net-suppressive relative to their own degree structure — rewiring makes both networks more active (female +27 points, male +12 points). The female’s wiring damps far harder per unit of degree (0.471 log units) than the male’s (0.146). The sex difference in recruitment is thus largely the story of the female connectome’s unusually suppressive specific wiring, not of the male’s amplification.</p>
+<h3 id="dispersion-versus-gain-the-ratio-is-regime-dependent-the-log-gap-is-not">3.4 Dispersion versus gain: the ratio is regime-dependent, the log-gap is not</h3>
+<p>Because E[|w|] grows as exp(σ²/2) under a raw sweep, σ sweeps confound weight dispersion with mean gain. The mean-matched sweep removes the confound:</p>
+<p><strong>Table 4. Weight-rule sensitivity (2000 ms; mean ± SD over 3 seed-pairs; ratios with bootstrap 95% CI).</strong></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Rule</th>
+<th>Female</th>
+<th>Male</th>
+<th>Ratio</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>linear, w_syn = 0.1</td>
+<td>1.35 ± 0.29%</td>
+<td>35.20 ± 0.68%</td>
+<td>26.1× [21.9, 33.7]</td>
+</tr>
+<tr>
+<td>lognormal σ=0.5, mean-matched</td>
+<td>2.15 ± 0.44%</td>
+<td>36.75 ± 1.00%</td>
+<td>17.1× [14.2, 21.4]</td>
+</tr>
+<tr>
+<td>lognormal σ=1.0, mean-matched</td>
+<td>2.32 ± 0.11%</td>
+<td>38.32 ± 0.59%</td>
+<td>16.5× [15.8, 17.2]</td>
+</tr>
+<tr>
+<td>lognormal σ=1.6, mean-matched</td>
+<td>2.81 ± 0.33%</td>
+<td>40.93 ± 0.35%</td>
+<td>14.5× [13.4, 16.7]</td>
+</tr>
+<tr>
+<td>lognormal σ=0.5, raw w_syn=0.1</td>
+<td>3.98 ± 2.07%</td>
+<td>38.12 ± 2.97%</td>
+<td>9.6× [6.3, 18.6]</td>
+</tr>
+<tr>
+<td>lognormal σ=1.6, raw w_syn=0.1</td>
+<td>45.04 ± 0.49%</td>
+<td>79.03 ± 0.16%</td>
+<td>1.75× [1.74, 1.78]</td>
+</tr>
+<tr>
+<td>log1p</td>
+<td>1.00 ± 0.00%</td>
+<td>1.00 ± 0.00%</td>
+<td>1.0× (drive floor)</td>
+</tr>
+<tr>
+<td>sqrt</td>
+<td>1.00 ± 0.00%</td>
+<td>1.00 ± 0.00%</td>
+<td>1.0× (drive floor)</td>
+</tr>
+</tbody>
+</table>
+<p>With mean weight pinned to the linear baseline, dispersion alone (σ from 0.5 to 1.6) leaves the ratio nearly unchanged (17.1× → 14.5×) — <strong>dispersion is not the mechanism</strong>. The compression to 1.75× in the raw-w_syn anchor comes from <em>gain</em>: raising mean |w| ~3.6× pushes the female network past its ignition threshold (2.8% → 45%) far more than the male (40.9% → 79%). The honest summary is that the recruitment <em>ratio</em> depends on the operating point (26× threshold regime, 1.75× near saturation), while the underlying sensitivity — how much less drive the male network needs for equal recruitment — is stable across rules (§3.5).</p>
+<h3 id="criticality-is-invariant-recruitment-curves-are-shifted">3.5 Criticality is invariant; recruitment curves are shifted</h3>
+<p>The branching ratio is 0.983–1.005 in <strong>every</strong> condition, both sexes, every weight rule and drive level tested — including all DES-rewired and ablation networks. Both connectomes self-organize to criticality; the sex difference is <em>where on the recruitment curve</em> each sits, not the curve’s shape:</p>
+<p><strong>Table 5. Recruitment ladder (σ = 1.6; single seed-pair per point except w_syn = 0.1, which is the 3-seed anchor).</strong></p>
+<table>
+<thead>
+<tr>
+<th>w_syn</th>
+<th>Female % fired</th>
+<th>Male % fired</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.01</td>
+<td>—</td>
+<td>1.96</td>
+</tr>
+<tr>
+<td>0.02</td>
+<td>1.73</td>
+<td>29.35</td>
+</tr>
+<tr>
+<td>0.03</td>
+<td>—</td>
+<td>44.13</td>
+</tr>
+<tr>
+<td>0.04</td>
+<td>16.57</td>
+<td>—</td>
+</tr>
+<tr>
+<td>0.05</td>
+<td>—</td>
+<td>64.97</td>
+</tr>
+<tr>
+<td>0.06</td>
+<td>27.83</td>
+<td>—</td>
+</tr>
+<tr>
+<td>0.10</td>
+<td>45.04 ± 0.49</td>
+<td>79.03 ± 0.16</td>
+</tr>
+<tr>
+<td>0.15</td>
+<td>57.55</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>The male reaches equivalent recruitment at roughly 2–3× lower w_syn (male 0.02 → 29.4% vs female 0.06 → 27.8%; male 0.05 → 65.0% vs female 0.15 → 57.6%). This w_syn-equivalence (~2.5×) is the cleanest scale-free statement of the sex difference and is consistent across the ladder.</p>
+<h3 id="silencing-dimorphic-neurons-modest-distributed-and-now-nulled">3.6 Silencing dimorphic neurons: modest, distributed, and now nulled</h3>
+<p>Silencing all edges touching the 2.4% dimorphic neurons reduces male recruitment by 8.4% relative (35.20 → 32.23 ± 0.45%). The size-matched random-ablation null (5 seeds) reduces it by 4.9% (33.46 ± 0.92%). The dimorphic-specific effect is therefore real but modest — a 1.7× larger effect than random loss of the same number of neurons — and the sex difference survives it almost intact. In the female, silencing her dimorphic set is indistinguishable from random ablation (1.33 ± 0.29 vs 1.32 ± 0.04).</p>
+<p><strong>Table 6. Silencing with null (linear weights; mean ± SD; ablation null over 5 seeds).</strong></p>
+<table>
+<colgroup>
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+<col style="width: 25%" />
+</colgroup>
+<thead>
+<tr>
+<th>Network</th>
+<th>Real</th>
+<th>Dimorphic-silenced</th>
+<th>Random-ablated (null)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Male MCNS</td>
+<td>35.20 ± 0.68%</td>
+<td>32.23 ± 0.45% (−8.4%)</td>
+<td>33.46 ± 0.92% (−4.9%)</td>
+</tr>
+<tr>
+<td>Female BANC</td>
+<td>1.35 ± 0.29%</td>
+<td>1.33 ± 0.29% (−1.5%)</td>
+<td>1.32 ± 0.04% (−2.2%)</td>
+</tr>
+</tbody>
+</table>
+<p>The sex difference is a distributed property of whole-network wiring, not a localized effect of annotated sex-specific circuits — consistent with the distributed dimorphism reported for the male CNS connectome (Berg et al., 2026).</p>
+<h3 id="sign-structure-is-net-suppressive-in-both-sexes">3.7 Sign structure is net-suppressive in both sexes</h3>
+<p>Shuffling excitatory/inhibitory signs (preserving all wiring and sign counts) <em>increases</em> recruitment in both sexes: male 35.20 → 61.12 ± 2.88%, female 1.35 → 13.16 ± 10.50% (Table 7). Real E/I placement is therefore actively suppressive relative to random sign placement — inhibition is not decorative. The female’s shuffled network is bimodal across seeds (19.3%, 19.2%, 1.0%): it sits at an ignition threshold where two of three seed draws escape the drive floor and one does not. We report the mean ± SD with the bimodality stated, and treat the female σ = 0.5 anchor (3.98 ± 2.07%, seeds 6.15/2.02/3.77) with the same candor.</p>
+<p><strong>Table 7. Sign-shuffle control (linear weights, w_syn = 0.1; mean ± SD over 3 seed-pairs).</strong></p>
+<table>
+<thead>
+<tr>
+<th>Network</th>
+<th>Real</th>
+<th>Sign-shuffled</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Male MCNS</td>
+<td>35.20 ± 0.68%</td>
+<td>61.12 ± 2.88%</td>
+</tr>
+<tr>
+<td>Female BANC</td>
+<td>1.35 ± 0.29%</td>
+<td>13.16 ± 10.50% (bimodal: 19.3/19.2/1.0)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="controls-for-rate-confounding-in-higher-order-metrics">3.8 Controls for rate-confounding in higher-order metrics</h3>
+<p>When comparing networks with varying activity levels, metrics that scale with firing rate are highly susceptible to artifactual divergence: the more active network differs on such metrics for reasons unrelated to wiring. We demonstrate this here by evaluating transfer entropy, participation ratio, and CV of ISI under per-neuron rate matching, in which the male’s spike train is subsampled to the female’s per-neuron rate before metric computation:</p>
+<ul>
+<li><strong>Transfer entropy.</strong> The raw TE difference (0.0221 vs 0.0005, a “44×” gap) collapses to 0.9× under per-neuron rate matching (0.00047 vs 0.00051). The apparent information-flow advantage is a firing-rate artifact: at matched per-neuron rate, the sexes are indistinguishable in information flow.</li>
+<li><strong>Participation ratio.</strong> The raw PR suggests the male is lower-dimensional (1.28 vs 6.08, “more synchronized”). Under rate matching the male appears <em>more</em> high-dimensional (43.1 vs 6.1) — but this reversal is itself an artifact: spike thinning decorrelates neurons and inflates PR for both sexes (the female’s own PR rises from 6.08 to 19.5 when thinned to a common 2 Hz rate). Dimensionality estimated from post-hoc thinning is not defensible in either direction; a matched-rate simulation would be required for any claim.</li>
+<li><strong>CV of ISI.</strong> The raw CV difference (2.99 vs 1.01) shrinks to 1.21 vs 1.00 under rate matching. Moreover, CV <strong>reverses sign between operating regimes</strong> (linear: male 2.74 vs female 1.04; σ = 1.6 anchor: female 2.68 vs male 1.48), so a single-regime CV comparison is uninterpretable without rate context.</li>
+</ul>
+<hr />
+<h2 id="discussion">4. Discussion</h2>
+<p><strong>The finding.</strong> Embedded in an identical dynamical model, the male <em>Drosophila</em> CNS recruits substantially more of itself than the female CNS at matched drive. Under lognormal weights matched to the literature’s fitted log-spread, the recruitment ratio is 1.75× [1.74–1.78] with the male at 79% and the female at 45%; under linear weights it is 26×; under mean-matched lognormal it is 14.5–17×. The scale-free statement: the male reaches equal recruitment at 2–3× lower synaptic weight scale.</p>
+<p><strong>The decomposition.</strong> Degree-preserving rewiring splits the log-gap roughly 58/42 between specific wiring and degree/density structure: nearly half of the male’s recruitment advantage is available from degree structure alone (more edges per neuron, 80/20 E/I vs 75/25), and the majority from which specific edges exist. Equally important, both networks’ specific wiring is net-suppressive relative to their own degree skeletons — the female’s far more so (0.47 vs 0.15 log units). The sex difference is as much about the female connectome’s damping as the male’s amplification.</p>
+<p><strong>Criticality.</strong> Every network in this study — both sexes, all weight rules, all drive levels, all nulls — sits at branching ratio ≈ 1. The sex difference manifests as position on a shared critical recruitment curve, not as a different dynamical regime. This is consistent with self-organized criticality in the fly connectome (Shiu et al., 2024) and sharpens the comparison: what differs between the sexes is the coupling strength required to sit at a given point on that curve.</p>
+<p><strong>Why the magnitude question is regime-relative.</strong> The recruitment ratio depends on where the networks sit relative to their ignition thresholds: near-threshold regimes amplify the gap (14–27×); high-gain regimes compress it (1.75×). Reporting a single ratio without its operating point obscures the underlying network dynamics. We recommend connectome-dynamics comparisons report (i) the recruitment ladder (§3.5), (ii) the w_syn-equivalence ratio, and (iii) any operating-point ratio with its regime stated — not a headline number alone.</p>
+<p><strong>Methodological contributions.</strong> (1) The dual-seed SSOT protocol (independent weight and dynamics seeds, append-only ledger, bootstrap CIs on ratios). (2) The DES decomposition as a routine control for connectome dynamics: it is cheap, degree-exact, and separates wiring effects from degree/density effects. (3) The ablation-null standard for silencing claims. (4) The rate-matching controls of §3.8 as a demonstration of how higher-order metrics fail across activity regimes.</p>
+<hr />
+<h2 id="limitations">5. Limitations</h2>
+<ul>
+<li><strong>Synaptic weights are inferred, not measured.</strong> Counts are a proxy; the lognormal rule is synthetic (i.i.d. log-noise on counts), not a per-edge effectome fit (Pospisil et al., 2024). Our spread-matching (σ = 1.6 ⇒ SD(log|w|) ≈ 1.83) matches the literature’s marginal log-spread but not its structure.</li>
+<li><strong>Operating-point dependence.</strong> The 1.75× headline holds at the high-recruitment anchor; threshold-regime ratios are 14–27×. We consider the w_syn-equivalence (~2.5×) the most transferable quantity.</li>
+<li><strong>Null-network simulations use a fixed dynamics seed.</strong> DES and ablation sims vary build seed but not simulation seed; cross-seed SD in the nulls was small (≤ 0.21 pp), but full dual-seed nulls would tighten the decomposition CI.</li>
+<li><strong>Criticality ladder points are single-seed</strong> (except the w_syn = 0.1 anchors).</li>
+<li><strong>No gap junctions, neuromodulation, or conduction delays.</strong> Known dynamics-shaping omissions.</li>
+<li><strong>Dimorphism annotation is incomplete;</strong> the 2.4% figure is a lower bound, and dimorphic-set silencing inherits annotation bias.</li>
+<li><strong>Transfer entropy used simplified binned estimation</strong>; a proper estimator (e.g., JIDT) would be required for any use of that metric.</li>
+</ul>
+<hr />
+<h2 id="conclusion">6. Conclusion</h2>
+<p>The male and female <em>Drosophila</em> CNS connectomes, embedded in an identical LIF model, differ robustly in intrinsic recruitment: the male recruits 1.75× [1.74–1.78] more of its network under literature-matched lognormal weights, and reaches equal recruitment at 2–3× lower synaptic weight scale — under every weight rule tested. Degree-preserving decomposition attributes ~58% of the log-scale difference to specific wiring and ~42% to degree/density structure, with both connectomes’ specific wiring acting net-suppressively relative to their degree skeletons. All networks self-organize to criticality; the sex difference is position on a shared recruitment curve. Dimorphic-circuit silencing and its size-matched null show the difference is distributed, not localized. Rate-matching controls demonstrate that transfer entropy and participation ratio are vulnerable to artifactual divergence across activity regimes and should not be used as headline metrics in such comparisons. We release the dual-seed SSOT protocol, the degree-preserving DES null, and the full results ledger as reusable standards for connectome-dynamics comparison.</p>
+<hr />
+<h2 id="references">References</h2>
+<ol type="1">
+<li>Dorkenwald, S., et al. (2024). Neuronal wiring diagram of an adult brain. <em>Nature</em> 634, 124–138.</li>
+<li>Shiu, P. K., et al. (2024). A Drosophila computational brain model reveals sensorimotor processing. <em>Nature</em> 634, 210–219.</li>
+<li>Pospisil, D. A., Aragon, M., &amp; Pillow, J. W. (2024). The fly connectome reveals a path to the effectome. <em>Nature</em> 634.</li>
+<li>Berg, S., et al. (2026). Sexual dimorphism in the complete connectome of the Drosophila male central nervous system. <em>Cell</em>.</li>
+<li>Lin, A., et al. (2024). Network statistics of the whole-brain connectome of Drosophila. <em>Nature</em> 634.</li>
+<li>Connectome-constrained modeling identifies neurons and dynamics (2026). <em>bioRxiv</em> 2026.08.21.745055.</li>
+<li>Bates, A. S., et al. (2025). Distributed control circuits across a brain-and-cord connectome. <em>Nature</em>.</li>
+<li>Suárez, L. E., et al. (2024). Connectome-based reservoir computing with the conn2res toolbox. <em>Nature Communications</em>.</li>
+</ol>
+<hr />
+<h2 id="reproducibility">Reproducibility</h2>
+<p>All numbers in this paper derive from a single append-only ledger, <code>results/ssot/ssot_results.jsonl</code> (84 unique records, dual-seed), aggregated by <code>aggregate_ssot.py</code> into <code>results/ssot_synthesis.md</code>. Pipeline:</p>
+<ol type="1">
+<li><code>normalize.py</code> — connectomes → common edge list</li>
+<li><code>double_edge_swap.py</code> — degree-preserving DES nulls (Q = 10, 3 seeds × 2 sexes, degree-verified)</li>
+<li><code>ablation_null.py</code> — size-matched random ablation nulls (5 seeds × 2 sexes)</li>
+<li><code>null_model.py</code> — sign-shuffle control</li>
+<li><code>ssot_run.py</code> — the dual-seed LIF experiment (weight_seed for weight draws, sim_seed for dynamics + drive selection; <code>brian2.seed()</code> explicit)</li>
+<li><code>gen_queue.py</code> — condition enumeration (42 conditions × 2 sexes)</li>
+<li><code>aggregate_ssot.py</code> — dedupe (last-timestamp-wins), mean ± SD, bootstrap ratio CIs → <code>ssot_synthesis.md</code></li>
+</ol>
+<p>Every result record carries <code>{tag, source, transform, sigma, w_syn, weight_seed, sim_seed, n_neurons, n_edges, pct_fired, rate_all_Hz, branching_ratio, cv_isi, …}</code>. Re-running the queue reproduces the ledger modulo wall-clock.</p>
+
+<p><a class="btn" href="Grillaert_Vocke_2026_Drosophila_CNS_connectome_sex_differences.pdf">📄 Download the typeset PDF</a>
+<a class="btn alt" href="flybrain_validation_package.zip">📦 Download code + ledger (zip)</a></p>
+</div>
+
+<div class="repo">
+<h2 class="repo-head" id="package">flybrain-connectome — Validation &amp; Reproducibility Package</h2>
+<p><em>Manuscript:</em> <em>Sex differences in whole-brain dynamics of the Drosophila CNS connectome: a matched leaky integrate-and-fire comparison with degree-preserving, sign-shuffle, and ablation-null controls</em></p>
+<p><em>Authors:</em> Katie Grillaert and Ed Vocke</p>
+<p><em>Version:</em> Final (2026-09-11). Every number in the manuscript derives from the single-source-of-truth (SSOT) ledger in this package.</p>
+
+<h3>Contents</h3>
+<table>
+<tr><th>Path</th><th>What it is</th></tr>
+<tr><td><code>Grillaert_Vocke_2026_Drosophila_CNS_connectome_sex_differences.pdf</code></td><td>Final manuscript (PDF, print-prepared)</td></tr>
+<tr><td><code>flybrain_validation_package.zip</code></td><td>Full package (code + ledger + manuscript, SHA-256 in MANIFEST.sha256)</td></tr>
+<tr><td><code>results/ssot/ssot_results.jsonl</code></td><td><strong>SSOT ledger</strong> — 87 records → 84 unique dual-seed runs. Single source of truth for every number in the paper</td></tr>
+<tr><td><code>results/ssot/des_build.log</code></td><td>Degree-preservation verification log for all 6 DES null connectomes</td></tr>
+<tr><td><code>results/ssot_synthesis.md</code></td><td>Aggregate statistics (mean ± SD over 3 seed-pairs, bootstrap 95% CIs)</td></tr>
+<tr><td><code>results/ssot_changelog.md</code></td><td>Legacy-vs-SSOT reconciliation (root causes verified in code)</td></tr>
+<tr><td><code>results/localization_results.md</code></td><td>Dimorphic-neuron localization analysis</td></tr>
+<tr><td><code>results/metrics_results.md</code></td><td>Raw metric comparison (pre-control)</td></tr>
+<tr><td><code>results/null_model_results.md</code></td><td>Sign-shuffle control</td></tr>
+<tr><td><code>results/rate_matched_correction.md</code></td><td>CV-of-ISI rate-confounding control</td></tr>
+<tr><td><code>results/te_rate_matched_correction.md</code></td><td>Transfer-entropy rate-confounding control</td></tr>
+<tr><td><code>results/pr_rate_matched_correction.md</code></td><td>Participation-ratio rate-confounding control</td></tr>
+<tr><td><code>results/robustness_results.md + robustness.csv</code></td><td>Drive/w_syn robustness sweeps</td></tr>
+<tr><td><code>results/lognormal_sigma_sweep_results.md</code></td><td>σ-sweep (weight-dispersion) results</td></tr>
+<tr><td><code>results/final_polish_results.md</code></td><td>Final linear w_syn sweep + multi-seed σ sweep (internally consistent re-runs)</td></tr>
+<tr><td><code>results/weight_sensitivity_results.md</code></td><td>Weight-rule sensitivity study (legacy single-seed values, superseded — see <code>ssot_changelog.md</code>)</td></tr>
+<tr><td><code>results/literature_review.md</code></td><td>First-hand literature cross-validation (Shiu 2024, Berg 2026, Lin 2024, Pospisil 2024, bioRxiv 2026.08.21.745055)</td></tr>
+<tr><td><code>*.py (repo root)</code></td><td>Full pipeline (Python; see REPRODUCING.md)</td></tr>
+<tr><td><code>data_provenance/DATA_SOURCES.md</code></td><td>First-hand source datasets, checksums, download locations</td></tr>
+<tr><td><code>REPRODUCING.md</code></td><td><strong>Step-by-step reproduction guide</strong></td></tr>
+<tr><td><code>VALIDATION_REPORT.md</code></td><td>Summary of every validation/verification performed</td></tr>
+<tr><td><code>MANIFEST.sha256</code></td><td>SHA-256 checksums of all files in this package</td></tr>
+</table>
+
+<h3>Data availability (summary)</h3>
+<p>Raw connectomes are <strong>not redistributed</strong> here (≈1.4 GB, public, versioned by their original projects). Exact filenames, SHA-256 checksums, and download locations are in <code>data_provenance/DATA_SOURCES.md</code>. The manuscript's headline claims can be re-verified directly from the ledger + synthesis without downloading data; full re-simulation requires the public connectomes.</p>
+
+<p><a class="btn" href="https://github.com/vocke4/flybrain-connectome">View repository on GitHub</a></p>
+</div>
+
+<footer>Data sources: Female adult CNS (BANC v888, FlyWire/Janelia FlyEM) · Male CNS v1.0 (male-cns.janelia.org). Code licensed MIT.</footer>
+</div></body>
+</html>

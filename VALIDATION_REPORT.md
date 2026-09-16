@@ -33,7 +33,7 @@ Every verification performed on this study, with first-hand evidence. Compiled 2
 
 | Check | Result |
 |---|---|
-| DES degree preservation | Degree sequences verified **identical** post-rewiring, all 6 connectomes (log: `results/ledger/des_build.log`); Q=10 mixing (10× edges swaps); 99.1%/98.7% acceptance |
+| DES degree preservation | Degree sequences verified **identical** post-rewiring, all 6 connectomes (log: `results/ssot/des_build.log`); Q=10 mixing (10× edges swaps); 99.1%/98.7% acceptance |
 | DES preserves weights-with-source | Weights travel with the presynaptic source edge |
 | DES reproducibility | 3 independent DES seeds per sex → DES recruitment SD ≤0.21% (female), ≤0.05% (male) |
 | Ablation null | 5 size-matched random-ablation seeds per sex (k=3,900 male / 3,803 female = exact dimorphic counts) |

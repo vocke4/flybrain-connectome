@@ -13,9 +13,9 @@ single-source-of-truth (SSOT) ledger in this package.
 
 | Path | What it is |
 |---|---|
-| `manuscript/Prep_printv2.pdf` | Final manuscript (PDF, print-prepared) |
-| `results/ledger/ssot_results.jsonl` | **SSOT ledger** — 87 records → 84 unique dual-seed runs. Single source of truth for every number in the paper |
-| `results/ledger/des_build.log` | Degree-preservation verification log for all 6 DES null connectomes |
+| `Grillaert_Vocke_2026_Drosophila_CNS_connectome_sex_differences.pdf` | Final manuscript (PDF, print-prepared) |
+| `results/ssot/ssot_results.jsonl` | **SSOT ledger** — 87 records → 84 unique dual-seed runs. Single source of truth for every number in the paper |
+| `results/ssot/des_build.log` | Degree-preservation verification log for all 6 DES null connectomes |
 | `results/ssot_synthesis.md` | Aggregate statistics (mean ± SD over 3 seed-pairs, bootstrap 95% CIs) |
 | `results/ssot_changelog.md` | Legacy-vs-SSOT reconciliation (root causes verified in code) |
 | `results/localization_results.md` | Dimorphic-neuron localization analysis |
@@ -29,7 +29,7 @@ single-source-of-truth (SSOT) ledger in this package.
 | `results/final_polish_results.md` | Final linear w_syn sweep + multi-seed σ sweep (internally consistent re-runs) |
 | `results/weight_sensitivity_results.md` | Weight-rule sensitivity study (legacy single-seed values, superseded — see `ssot_changelog.md`) |
 | `results/literature_review.md` | First-hand literature cross-validation (Shiu 2024, Berg 2026, Lin 2024, Pospisil 2024, bioRxiv 2026.08.21.745055) |
-| `code/` | Full pipeline (Python; see `REPRODUCING.md`) |
+| Pipeline scripts (repo root, `*.py`) | Full pipeline (Python; see `REPRODUCING.md`) |
 | `data_provenance/DATA_SOURCES.md` | First-hand source datasets, checksums, download locations |
 | `REPRODUCING.md` | **Step-by-step reproduction guide** |
 | `VALIDATION_REPORT.md` | Summary of every validation/verification performed |
