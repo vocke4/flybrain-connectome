@@ -22,7 +22,8 @@
   th { background:#161b22; white-space: nowrap; }
   /* package contents table: two-col, fixed-ish for alignment */
   .repo table { table-layout: fixed; width: 100%; }
-  .repo td:first-child, .repo th:first-child { width: 42%; overflow-wrap: break-word; word-break: break-word; }
+  .repo td:first-child, .repo th:first-child { width: 42%; }
+  .repo code { overflow-wrap: break-word; word-break: normal; hyphens: none; }
   .repo td:last-child { overflow-wrap: break-word; }
   /* paper tables: auto-fit to content, wrapped in .tblwrap for narrow screens */
   .paper table { font-size: 0.85em; table-layout: auto; }
@@ -30,6 +31,7 @@
   .tblwrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-width: 100%; }
   .tblwrap table { margin-left: 0; }
   code { background:#161b22; padding:1px 6px; border-radius:4px; font-size:0.9em; }
+  .paper code { overflow-wrap: break-word; word-break: normal; }
   pre { background:#161b22; padding:14px; border-radius:8px; overflow-x:auto; max-width:100%; }
   pre code { background:none; padding:0; white-space: pre-wrap; overflow-wrap: break-word; }
   .paper { background:#0b0f14; border:1px solid #21262d; border-radius:10px; padding: 28px 30px; margin-top: 18px; }
@@ -42,9 +44,10 @@
     .wrap { padding: 24px 14px 60px; }
     .paper { padding: 18px 14px; }
     h1 { font-size: 1.4em; }
-    .repo td:first-child, .repo th:first-child { width: 46%; }
+    .repo td:first-child, .repo th:first-child { width: 48%; }
     td, th { padding: 5px 7px; }
     table { font-size: 0.8em; }
+    .repo code { font-size: 0.85em; }
     .tblwrap { overflow-x: auto; }
   }
   .paper hr { border:none; border-top:1px solid #21262d; margin: 22px 0; }
