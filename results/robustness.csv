@@ -1,0 +1,17 @@
+network,w_syn,seed,fired_pct,mean_rate
+banc_female,0.05,real,1.0,8.94
+banc_female,0.1,real,1.8,10.81
+banc_female,0.2,real,21.8,106.33
+mcns_male,0.05,real,1.0,8.66
+mcns_male,0.1,real,36.5,147.03
+mcns_male,0.2,real,69.6,469.22
+banc_female,0.1,rewired_s0,1.0,8.82
+banc_female,0.1,rewired_s1,1.0,8.8
+banc_female,0.1,rewired_s2,1.0,8.83
+banc_female,0.1,rewired_s3,1.0,8.79
+banc_female,0.1,rewired_s4,1.0,8.73
+mcns_male,0.1,rewired_s0,1.1,8.82
+mcns_male,0.1,rewired_s1,1.1,8.67
+mcns_male,0.1,rewired_s2,1.1,8.75
+mcns_male,0.1,rewired_s3,1.1,8.69
+mcns_male,0.1,rewired_s4,1.2,8.51

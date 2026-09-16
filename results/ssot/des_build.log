@@ -1,0 +1,26 @@
+[banc_female] E=13379740 n_swaps=133797400 (Q=10.0)
+[banc_female] swaps done=133797400 attempts=135077907 (99.1% acceptance)
+[banc_female] degree sequences verified identical
+saved normalized/banc_female_des_0.npz
+[banc_female] E=13379740 n_swaps=133797400 (Q=10.0)
+[banc_female] swaps done=133797400 attempts=135078195 (99.1% acceptance)
+[banc_female] degree sequences verified identical
+saved normalized/banc_female_des_1.npz
+[banc_female] E=13379740 n_swaps=133797400 (Q=10.0)
+[banc_female] swaps done=133797400 attempts=135078837 (99.1% acceptance)
+[banc_female] degree sequences verified identical
+saved normalized/banc_female_des_2.npz
+DES female complete Fri Sep 11 12:55:34 CDT 2026
+[mcns_male] E=24410950 n_swaps=244109500 (Q=10.0)
+[mcns_male] swaps done=244109500 attempts=247274883 (98.7% acceptance)
+[mcns_male] degree sequences verified identical
+saved normalized/mcns_male_des_0.npz
+[mcns_male] E=24410950 n_swaps=244109500 (Q=10.0)
+[mcns_male] swaps done=244109500 attempts=247277290 (98.7% acceptance)
+[mcns_male] degree sequences verified identical
+saved normalized/mcns_male_des_1.npz
+[mcns_male] E=24410950 n_swaps=244109500 (Q=10.0)
+[mcns_male] swaps done=244109500 attempts=247274800 (98.7% acceptance)
+[mcns_male] degree sequences verified identical
+saved normalized/mcns_male_des_2.npz
+DES male complete Fri Sep 11 14:07:08 CDT 2026
