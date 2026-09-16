@@ -17,17 +17,30 @@
   a:hover { text-decoration: underline; }
   .btn { display:inline-block; background:#238636; color:#fff; font-family:-apple-system,sans-serif; font-weight:600; border-radius:6px; padding:8px 16px; text-decoration:none; margin: 6px 8px 6px 0; }
   .btn.alt { background:#21262d; border:1px solid #30363d; }
-  table { border-collapse: collapse; width:100%; font-size: 0.88em; margin: 14px 0; }
-  td, th { border: 1px solid #30363d; padding: 6px 10px; text-align:left; vertical-align: top; }
+  table { border-collapse: collapse; width:100%; max-width:100%; font-size: 0.88em; margin: 14px 0; table-layout: fixed; }
+  td, th { border: 1px solid #30363d; padding: 6px 10px; text-align:left; vertical-align: top; overflow-wrap: break-word; word-break: break-word; hyphens: auto; }
   th { background:#161b22; }
+  td:first-child, th:first-child { width: 42%; }
+  /* pandoc paper tables: keep readable, cap first col */
+  .paper table { font-size: 0.85em; }
+  .paper td:first-child, .paper th:first-child { width: 30%; }
   code { background:#161b22; padding:1px 6px; border-radius:4px; font-size:0.9em; }
-  pre { background:#161b22; padding:14px; border-radius:8px; overflow-x:auto; }
-  pre code { background:none; padding:0; }
+  pre { background:#161b22; padding:14px; border-radius:8px; overflow-x:auto; max-width:100%; }
+  pre code { background:none; padding:0; white-space: pre-wrap; overflow-wrap: break-word; }
   .paper { background:#0b0f14; border:1px solid #21262d; border-radius:10px; padding: 28px 30px; margin-top: 18px; }
   .paper p { text-align: justify; }
   .repo { margin-top: 56px; }
   .repo-head { border-top: 2px solid #30363d; padding-top: 26px; }
   footer { margin-top:56px; color:#8b949e; font-size:0.85em; border-top:1px solid #21262d; padding-top:16px; }
+  @media (max-width: 640px) {
+    body { font-size: 15px; }
+    .wrap { padding: 24px 14px 60px; }
+    .paper { padding: 18px 14px; }
+    h1 { font-size: 1.4em; }
+    td:first-child, th:first-child { width: 46%; }
+    td, th { padding: 5px 7px; }
+    table { font-size: 0.8em; }
+  }
   .paper hr { border:none; border-top:1px solid #21262d; margin: 22px 0; }
 </style>
 </head>
