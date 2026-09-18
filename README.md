@@ -4,7 +4,7 @@
 
 **Authors:** Katie Grillaert and Ed Vocke
 
-**Version:** Final (2026-09-11). Every number in the manuscript derives from the
+**Package date:** 2026-09-18. Every number in the manuscript derives from the
 single-source-of-truth (SSOT) ledger in this package.
 
 ---
@@ -13,23 +13,24 @@ single-source-of-truth (SSOT) ledger in this package.
 
 | Path | What it is |
 |---|---|
-| `Grillaert_Vocke_2026_Drosophila_CNS_connectome_sex_differences.pdf` | Final manuscript (PDF, print-prepared) |
-| `results/ssot/ssot_results.jsonl` | **SSOT ledger** — 87 records → 84 unique dual-seed runs. Single source of truth for every number in the paper |
+| `manuscript/preprint.md` | Final manuscript (canonical text, Markdown) |
+| `manuscript/preprint_v3.pdf` | Final manuscript (PDF render, 2026-09-18) |
+| `results/ssot/ssot_results.jsonl` | **SSOT ledger** — 133 records → 130 unique dual-seed runs, 46 (tag, sex) families. Single source of truth for every number in the paper |
 | `results/ssot/des_build.log` | Degree-preservation verification log for all 6 DES null connectomes |
+| `results/crit_probe/` | Criticality-probe and w_syn-ladder ledgers (§3.5) |
+| `phase0_runs.py` + `run_b2.sh` / `run_b2b.sh` / `crit_probe.py` | Ledger-supplement and probe drivers (σ=1.83 probe, DES 3×3, ablation 5×3, ladder equivalents, DES-decomposition anchor map, quiescence-referenced criticality probe; append-only, idempotent) |
 | `results/ssot_synthesis.md` | Aggregate statistics (mean ± SD over 3 seed-pairs, bootstrap 95% CIs) |
-| `results/ssot_changelog.md` | Legacy-vs-SSOT reconciliation (root causes verified in code) |
-| `results/localization_results.md` | Dimorphic-neuron localization analysis |
+| `results/localization_results.md` | Dimorphic-neuron localization analysis with size-matched ablation null |
 | `results/metrics_results.md` | Raw metric comparison (pre-control) |
 | `results/null_model_results.md` | Sign-shuffle control |
 | `results/rate_matched_correction.md` | CV-of-ISI rate-confounding control |
 | `results/te_rate_matched_correction.md` | Transfer-entropy rate-confounding control |
 | `results/pr_rate_matched_correction.md` | Participation-ratio rate-confounding control |
-| `results/robustness_results.md` + `robustness.csv` | Drive/w_syn robustness sweeps |
+| `results/robustness_results.md` + `robustness.csv` | Drive/w_syn robustness sweeps (SSOT values) |
 | `results/lognormal_sigma_sweep_results.md` | σ-sweep (weight-dispersion) results |
-| `results/final_polish_results.md` | Final linear w_syn sweep + multi-seed σ sweep (internally consistent re-runs) |
-| `results/weight_sensitivity_results.md` | Weight-rule sensitivity study (legacy single-seed values, superseded — see `ssot_changelog.md`) |
-| `results/literature_review.md` | First-hand literature cross-validation (Shiu 2024, Berg 2026, Lin 2024, Pospisil 2024, bioRxiv 2026.08.21.745055) |
-| Pipeline scripts (repo root, `*.py`) | Full pipeline (Python; see `REPRODUCING.md`) |
+| `results/weight_sensitivity_results.md` | Weight-rule sensitivity study (dual-seed SSOT values) |
+| `results/literature_review.md` | Literature cross-validation (Shiu 2024, Berg 2026, Lin 2024, Pospisil 2024, bioRxiv 2026.08.21.745055) |
+| Pipeline scripts (package root: `normalize.py`, `double_edge_swap.py`, `ssot_run.py`, `aggregate_ssot.py`, …) | Full pipeline (Python; see `REPRODUCING.md`) |
 | `data_provenance/DATA_SOURCES.md` | First-hand source datasets, checksums, download locations |
 | `REPRODUCING.md` | **Step-by-step reproduction guide** |
 | `VALIDATION_REPORT.md` | Summary of every validation/verification performed |

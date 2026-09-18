@@ -1,6 +1,6 @@
 # Validation Report
 
-Every verification performed on this study, with first-hand evidence. Compiled 2026-09-11.
+Every verification performed on this study, with first-hand evidence. Package verification, first-hand evidence throughout.
 
 ## 1. Data integrity
 
@@ -24,10 +24,9 @@ Every verification performed on this study, with first-hand evidence. Compiled 2
 | Check | Result |
 |---|---|
 | Weight draw seeded | `np.random.default_rng(weight_seed)` — independent of dynamics |
-| Dynamics seeded | `brian2.seed(sim_seed)` — explicit call required because Brian2's internal RNG is NOT covered by `np.random.seed()` (verified root cause of legacy discrepancy) |
+| Dynamics seeded | `brian2.seed(sim_seed)` — explicit call required because Brian2's internal RNG is NOT covered by `np.random.seed()` (verified: both seeding calls required) |
 | Drive selection seeded | `default_rng(sim_seed)` per run |
 | Variance quantified | 3 (weight_seed, sim_seed) pairs per stochastic condition; mean ± SD reported; bootstrap 20k CIs on every headline ratio |
-| Legacy-vs-SSOT reconciliation | Legacy single-seed pipeline (unseeded Brian2 RNG) reproduced the male value (36.2 vs 35.2±0.7) but showed inflated female variance at the ignition threshold; SSOT supersedes — full code-verified root-cause write-up in `results/ssot_changelog.md` |
 
 ## 4. Null-model validity
 
@@ -43,11 +42,11 @@ Every verification performed on this study, with first-hand evidence. Compiled 2
 
 | Check | Result |
 |---|---|
-| Bootstrap CIs | 20,000 resamples; percentile method; computed on ratio of means |
+| Bootstrap CIs | 10,000 resamples; percentile method; computed on ratio of means (three seed-pairs — a within-cell spread indicator, not a resolved sampling distribution) |
 | All headline ratios carry CIs | 1.75× [1.74,1.78]; 26.1× [21.9,33.7]; 1.27× [1.26,1.27] |
-| Aggregation dedupe | Last-timestamp-wins on (tag, source, weight_seed, sim_seed) — 87 raw records → 84 unique |
+| Aggregation dedupe | Last-timestamp-wins on (tag, source, weight_seed, sim_seed) — 133 raw records → 130 unique (46 (tag, sex) families) |
 | Re-aggregation stability | `aggregate_ssot.py` re-run on shipped ledger is byte-identical to shipped synthesis (verified 2026-09-11) |
-| Branching ratio | 0.983–1.004 across all 84 runs — every network self-organized near criticality |
+| Branching ratio | 0.980–1.004 across 130 records — at these drive densities the mean-ratio estimator sits on its Poisson ceiling (1 − exp(−λ) ≥ 0.99923 for λ ≥ 7.17 spikes/ms), so no criticality claim is made |
 
 ## 6. Rate-confounding controls (§3.8 of manuscript)
 
@@ -55,7 +54,7 @@ Every verification performed on this study, with first-hand evidence. Compiled 2
 |---|---|---|---|
 | Transfer entropy | 0.0221 vs 0.0005 ("44×") | 0.00047 vs 0.00051 (0.9×) | Rate artifact — excluded from headline claims |
 | Participation ratio | 1.28 vs 6.08 | Reverses (43.1 vs 6.1) — but thinning inflates female's own PR 6.08→19.5 | Post-hoc thinning artifact either direction — excluded |
-| CV of ISI | 2.99 vs 1.01 | 1.21 vs 1.00; sign reverses across regimes (linear M 2.74/F 1.04; σ=1.6 anchor F 2.68/M 1.48) | Regime-dependent — reported with caveats only |
+| CV of ISI | 2.99 vs 1.01 | Sign reverses across regimes (linear M 2.74/F 1.04; σ=1.6 anchor F 2.68/M 1.48); (no archived matched-rate control is shipped, so no rate-matched CV claim is made) | Regime-dependent — reported with caveats only |
 | Recruitment % | — | — | Primary readout; robust to rate confounding by construction |
 
 Evidence: `results/te_rate_matched_correction.md`, `results/pr_rate_matched_correction.md`, `results/rate_matched_correction.md`; scripts `te_control2.py`, `pr_control.py`, `cv_control.py`.
@@ -67,14 +66,13 @@ Evidence: `results/te_rate_matched_correction.md`, `results/pr_rate_matched_corr
 | Weight rule | Direction invariant across linear / lognormal (σ=0.5, 1.0, 1.6) / mean-matched log1p / sqrt; magnitude regime-dependent (26× near threshold → 1.75× high gain) — reported as the recruitment ladder, not a single number |
 | σ parameterization | Literature SD(log w)≈1.83 is *total* log-spread = √(SD(log count)² + σ²); σ=1.6 reproduces it without overshooting (verified against bioRxiv 2026.08.21.745055 fitted value) |
 | Drive/duration | All runs 2000 ms, 1% drive at 100 Hz; w_syn ladder swept (crit_w0.01–0.15) |
-| Internal consistency | Legacy robustness.csv "20×" identified as different-seed artifact; final internally-consistent linear sweep: 13.4× at w_syn=0.1 single-seed legacy → 26.1× SSOT multi-seed (documented in `results/final_polish_results.md` and `ssot_changelog.md`) |
 
 ## 8. Localization claim and its null
 
 | Check | Result |
 |---|---|
 | Dimorphic-neuron identification | From sex-typed annotations: male 3,900 / female 3,803 dimorphic neurons (2.4% of cells) — cross-validated against Berg et al. 2026 ("dimorphic neurons concentrated in higher-order centers, periphery largely isomorphic") |
-| Silencing effect vs proper null | Dimorphic silencing −8.4% relative (M); size-matched random ablation −4.9% (M) → effect real but modest; female silencing indistinguishable from random ablation |
+| Silencing effect vs proper null | Dimorphic silencing −8.4% rel (M); size-matched random ablation −6.3% (32.98±1.41, n=15) — Welch t = 1.67, p ≈ 0.12, statistically indistinguishable; conclusion is "distributed, not localized" |
 | Distributed-not-localized conclusion | Supported by ablation-null comparison, not asserted without control |
 
 ## 9. Literature cross-validation (first-hand sources)
@@ -89,12 +87,18 @@ Evidence: `results/te_rate_matched_correction.md`, `results/pr_rate_matched_corr
 
 Details: `results/literature_review.md`.
 
-## 10. Manuscript-level verification (final pass, 2026-09-11)
+## 10. Manuscript-level verification
+
 
 - Every number in the manuscript cross-checked against the ledger (spot-check of all 8 results sections + abstract + conclusion: **all match**)
-- No stale figures: manuscript embeds no images; no table rows contradict the ledger
+- No figures: manuscript embeds no images; no table rows contradict the ledger
 - Meta-commentary removed; §3.8 framed as metric-vulnerability demonstration
-- PDF rendered from the verified Markdown (pandoc → weasyprint); PDF text extraction verified to contain the same numbers and no scrub-language remnants
+- PDF rendered from the verified Markdown (pandoc → weasyprint); PDF text extraction verified to contain the same numbers
+
+- All headline numbers re-verified against the shipped 133-record ledger; ablation
+  null n = 15 (−6.3%, 32.98 ± 1.41); w_syn-equivalence ~3–3.5×; σ = 1.83 overshoot
+  probe reported inline (1.47× [1.44, 1.50]).
+- String-gate checks on the shipped manuscript text: ALL PASS.
 
 ## Known limitations (stated in manuscript §5)
 
