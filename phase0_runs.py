@@ -14,7 +14,7 @@ Stage D  equivalence pairs 3-seed    8 runs  — 2.5x -> 3.0x with error bars
 import json, os, subprocess, sys, time
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.dirname(HERE)
+REPO = HERE  # script lives at the package/repo root
 LEDGER = os.path.join(REPO, "results", "ssot", "ssot_results.jsonl")
 PY = os.environ.get("PYTHON", os.path.join(REPO, "venv", "bin", "python"))
 LOG = os.path.join(HERE, "phase0_runs.log")
